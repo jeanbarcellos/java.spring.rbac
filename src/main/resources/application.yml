@@ -3,11 +3,11 @@ server:
 
 spring:
   application:
-    name: 'manager-proccess'
+    name: 'rbac'
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:process-manager}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:java_spring_rbac}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
     initialization-mode: always
