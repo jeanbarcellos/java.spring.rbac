@@ -1,0 +1,45 @@
+server:
+  port: ${PORT:8081}
+
+spring:
+  application:
+    name: 'manager-proccess'
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:process-manager}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    initialization-mode: always
+    initialize: true
+    continue-on-error: true
+    platform: postgresql
+    maxActive: 3
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop # update, create-drop, none
+      format_sql: true
+    show_sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL9Dialect
+
+app-config:
+  name: ${APP_NAME:Process Manager}
+  description: ${APP_DESCRIPTION:Projeto backend para gerenciador de processos.}
+  version: ${APP_VERSION:1.0.0}
+  url: ${APP_URL:http://localhost:8081}
+
+  key: ${APP_KEY:bWFuYWdlci1wcm9jZXNzLXNlY3JldC1kZXYtMTIzNDU2} # manager-process-secret-dev-123456 em base64
+
+  jwt:
+    secret: ${app-config.key}
+    issuer: ${app-config.url}
+    audience: ${app-config.url}
+    expiration: ${APP_JWT_EXPIRATION:1440} # minutes
+
+  oauth:
+    client:
+      name: ${APP_OAUTH_CLIENT_NAME:myappname123}
+      secret: ${APP_OAUTH_CLIENT_SECRET:myappsecret123}
