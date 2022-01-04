@@ -1,9 +1,9 @@
 package com.jeanbarcellos.processmanager.services;
 
+import static org.springframework.util.ObjectUtils.isEmpty;
+
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.validation.ValidationException;
 
 import com.jeanbarcellos.processmanager.domain.entities.Role;
 import com.jeanbarcellos.processmanager.domain.entities.User;
@@ -12,6 +12,8 @@ import com.jeanbarcellos.processmanager.domain.repositories.UserRepository;
 import com.jeanbarcellos.processmanager.dtos.SuccessResponse;
 import com.jeanbarcellos.processmanager.dtos.UserRequest;
 import com.jeanbarcellos.processmanager.dtos.UserResponse;
+import com.jeanbarcellos.processmanager.exceptions.NotFoundException;
+import com.jeanbarcellos.processmanager.exceptions.ValidationException;
 import com.jeanbarcellos.processmanager.mappers.UserMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
+    private static final String MSG_ERROR_USER_NOT_INFORMED = "O ID do usuário deve ser informado.";
     private static final String MSG_ERROR_USER_NOT_FOUND = "Não há usário para o ID informado.";
+    private static final String MSG_USER_ACTIVATED_SUCCESSFULLY = "Usuário ativado com sucesso.";
+    private static final String MSG_USER_INACTIVATED_SUCCESSFULLY = "Usuário desativado com sucesso.";
 
     @Autowired
     private UserRepository userRepository;
@@ -40,7 +45,7 @@ public class UserService {
 
     public UserResponse getById(Integer id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ValidationException(MSG_ERROR_USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(MSG_ERROR_USER_NOT_FOUND));
 
         return UserMapper.toResponse(user);
     }
@@ -59,9 +64,7 @@ public class UserService {
     }
 
     public UserResponse update(Integer id, UserRequest request) {
-        if (userRepository.existsById(id)) {
-            new ValidationException(MSG_ERROR_USER_NOT_FOUND);
-        }
+        this.validateExistsById(id);
 
         List<Role> roles = roleRepository.findByIdIn(request.getRoles());
 
@@ -76,7 +79,6 @@ public class UserService {
     }
 
     public SuccessResponse activate(Integer id) {
-
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ValidationException(MSG_ERROR_USER_NOT_FOUND));
 
@@ -84,11 +86,10 @@ public class UserService {
 
         userRepository.save(user);
 
-        return SuccessResponse.create("Usuário ativado com sucesso");
+        return SuccessResponse.create(MSG_USER_ACTIVATED_SUCCESSFULLY);
     }
 
     public SuccessResponse inactivate(Integer id) {
-
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ValidationException(MSG_ERROR_USER_NOT_FOUND));
 
@@ -96,6 +97,16 @@ public class UserService {
 
         userRepository.save(user);
 
-        return SuccessResponse.create("Usuário destivado com sucesso");
+        return SuccessResponse.create(MSG_USER_INACTIVATED_SUCCESSFULLY);
+    }
+
+    private void validateExistsById(Integer id) {
+        if (isEmpty(id)) {
+            throw new ValidationException(MSG_ERROR_USER_NOT_INFORMED);
+        }
+
+        if (!userRepository.existsById(id)) {
+            throw new NotFoundException(MSG_ERROR_USER_NOT_FOUND);
+        }
     }
 }

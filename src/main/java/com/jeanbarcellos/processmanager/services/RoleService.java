@@ -1,11 +1,11 @@
 package com.jeanbarcellos.processmanager.services;
 
+import static org.springframework.util.ObjectUtils.isEmpty;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.validation.ValidationException;
 
 import com.jeanbarcellos.processmanager.domain.entities.Permission;
 import com.jeanbarcellos.processmanager.domain.entities.Role;
@@ -16,6 +16,7 @@ import com.jeanbarcellos.processmanager.dtos.RoleRequest;
 import com.jeanbarcellos.processmanager.dtos.RoleResponse;
 import com.jeanbarcellos.processmanager.dtos.SuccessResponse;
 import com.jeanbarcellos.processmanager.exceptions.NotFoundException;
+import com.jeanbarcellos.processmanager.exceptions.ValidationException;
 import com.jeanbarcellos.processmanager.mappers.RoleMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoleService {
 
+    private static final String MSG_ERROR_ROLE_NOT_INFORMED = "O ID do perfil deve ser informado.";
     private static final String MSG_ERROR_ROLE_NOT_FOUND = "Não há perfil para o ID informado.";
     private static final String MSG_ERROR_ROLE_INHERIT_NOT_FOUND = "Perfil para herdar não encontrada.";
     private static final String MSG_ROLE_DELETED_SUCCESSFULLY = "O perfil excluído com sucesso.";
@@ -39,7 +41,7 @@ public class RoleService {
 
     public RoleResponse getById(Integer id) {
         Role result = roleRepository.findById(id)
-                .orElseThrow(() -> new ValidationException(MSG_ERROR_ROLE_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(MSG_ERROR_ROLE_NOT_FOUND));
 
         return RoleMapper.toResponse(result);
     }
@@ -49,21 +51,19 @@ public class RoleService {
 
         this.assignChildRoles(role, request.getChildRoles());
 
-        role = roleRepository.save(role);
+        roleRepository.save(role);
 
         return RoleMapper.toResponse(role);
     }
 
     public RoleResponse update(Integer id, RoleRequest request) {
-        if (roleRepository.existsById(id)) {
-            new ValidationException(MSG_ERROR_ROLE_NOT_FOUND);
-        }
+        this.validateExistsById(id);
 
         Role role = RoleMapper.toRole(id, request);
 
         this.assignChildRoles(role, request.getChildRoles());
 
-        role = roleRepository.save(role);
+        roleRepository.save(role);
 
         return RoleMapper.toResponse(role);
     }
@@ -83,9 +83,7 @@ public class RoleService {
     }
 
     public SuccessResponse delete(Integer id) {
-        if (roleRepository.existsById(id)) {
-            new ValidationException(MSG_ERROR_ROLE_NOT_FOUND);
-        }
+        this.validateExistsById(id);
 
         roleRepository.deleteById(id);
 
@@ -94,7 +92,7 @@ public class RoleService {
 
     public Map<String, String> getPermisssions(Integer id) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new ValidationException(MSG_ERROR_ROLE_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(MSG_ERROR_ROLE_NOT_FOUND));
 
         Map<Permission, PermissionType> effectivePermissions = role.getPermissionsWithTypes();
 
@@ -104,5 +102,15 @@ public class RoleService {
         }
 
         return list;
+    }
+
+    private void validateExistsById(Integer id) {
+        if (isEmpty(id)) {
+            throw new ValidationException(MSG_ERROR_ROLE_NOT_INFORMED);
+        }
+
+        if (!roleRepository.existsById(id)) {
+            throw new NotFoundException(MSG_ERROR_ROLE_NOT_FOUND);
+        }
     }
 }
