@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/roles")
-@PreAuthorize("hasRole('" + Roles.ADMINISTRATOR + "')")
+@PreAuthorize("hasRole('" + Roles.ROOT + "')")
 public class RoleController extends BaseController {
 
     @Autowired

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/permissions")
-@PreAuthorize("hasRole('" + Roles.ADMINISTRATOR + "')")
+@PreAuthorize("hasRole('" + Roles.ROOT + "')")
 public class PermissionController extends BaseController {
 
     @Autowired
@@ -54,7 +54,7 @@ public class PermissionController extends BaseController {
     @PutMapping("/{id}")
     public ResponseEntity<PermissionResponse> update(@RequestBody @Valid PermissionRequest request,
             @PathVariable Integer id) {
-        PermissionResponse response = permissionService.update(id, request);
+        PermissionResponse response = permissionService.update(null, request);
 
         return ResponseEntity.ok(response);
     }
