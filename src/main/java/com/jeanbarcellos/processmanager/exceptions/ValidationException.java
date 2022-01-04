@@ -3,9 +3,9 @@ package com.jeanbarcellos.processmanager.exceptions;
 /**
  * Validação simples
  */
-public class ValiadtionException extends RuntimeException {
+public class ValidationException extends RuntimeException {
 
-    public ValiadtionException(String message) {
+    public ValidationException(String message) {
         super(message);
     }
 }

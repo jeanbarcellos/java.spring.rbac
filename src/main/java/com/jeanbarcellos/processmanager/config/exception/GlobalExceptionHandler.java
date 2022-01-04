@@ -1,11 +1,10 @@
 package com.jeanbarcellos.processmanager.config.exception;
 
-import javax.validation.ValidationException;
-
 import com.jeanbarcellos.processmanager.dtos.ErrorResponse;
 import com.jeanbarcellos.processmanager.dtos.ValidationErrorListRespose;
 import com.jeanbarcellos.processmanager.dtos.ValidationErrorMapRespose;
 import com.jeanbarcellos.processmanager.exceptions.NotFoundException;
+import com.jeanbarcellos.processmanager.exceptions.ValidationException;
 import com.jeanbarcellos.processmanager.exceptions.ValidationListException;
 import com.jeanbarcellos.processmanager.exceptions.ValidationMapException;
 
