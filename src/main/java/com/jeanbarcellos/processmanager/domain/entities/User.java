@@ -69,7 +69,7 @@ public class User implements UserDetails {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.status = UserStatus.INACTIVE;
+        this.status = UserStatus.ACTIVE;
     }
 
     public User(String name, String email, String password, UserStatus status) {
